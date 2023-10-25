@@ -1,5 +1,3 @@
-Aqui está um README simples para o seu projeto no GitHub:
-
 Weather Forecast App
 
 This is a simple weather forecast application developed using Python and the OpenWeather API. It allows users to input the name of a city and retrieve the current weather conditions, including the description, temperature, minimum temperature, and maximum temperature.
