@@ -5,15 +5,23 @@ import tkinter as tk
 API_KEY = 'YOUR_API_KEY'  # Replace 'YOUR_API_KEY' with your OpenWeather API key
 
 def get_weather_forecast():
+    # Reset the error message
+    result_label.config(text="")
+
     city = city_entry.get()
-    if city:
+    
+    if not city:
+        result_label.config(text="Please enter a valid city name.")
+        return
+
+    try:
         # Make a request to the OpenWeather API
-        link = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
+        link = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&lang=pt_br"
         response = requests.get(link)
         data = response.json()
 
         if response.status_code == 200:
-            # Extract description, temperature, minimum temperature, and maximum temperature from the response
+            # Extract weather data
             description = data['weather'][0]['description'].split(',')[0].capitalize()
             city_formatted = city.capitalize()
             temperature_kelvin = data['main']['temp']
@@ -32,9 +40,15 @@ def get_weather_forecast():
             temperature_min_label.config(text=f"Min Temp: {temperature_min_celsius:.0f}°C")
             temperature_max_label.config(text=f"Max Temp: {temperature_max_celsius:.0f}°C")
         else:
-            result_label.config(text="City not found.")
-    else:
-        result_label.config(text="Please enter a valid city.")
+            # Custom error message
+            error_message = "City not found. Please check the city name."
+            result_label.config(text=error_message)
+    except requests.exceptions.RequestException as e:
+        result_label.config(text="Network error. Please check your internet connection.")
+    except json.JSONDecodeError as e:
+        result_label.config(text="Error decoding the API response.")
+    except Exception as e:
+        result_label.config(text="An unexpected error occurred.")
 
 # Main window configuration
 window = tk.Tk()
@@ -66,6 +80,8 @@ temperature_min_label = tk.Label(window, text="", font=("Helvetica", 12))
 temperature_min_label.pack()
 temperature_max_label = tk.Label(window, text="", font=("Helvetica", 12))
 temperature_max_label.pack()
+result_label = tk.Label(window, text="", font=("Helvetica", 12))
+result_label.pack()
 
 # Start the interface
 window.mainloop()
